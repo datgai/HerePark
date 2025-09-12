@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react";
-import { BrowserRouter as Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import AdminLayout from "./pages/admin/Adminlayout";
+import Admin from "./pages/admin/Admin";
+import Parking from "./pages/admin/parking/Parking";
 
 function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetch("http://localhost:8000/api/ping")
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message));
-  }, []);
-
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">React + FastAPI + Docker</h1>
-      <p>Backend says: {message || "Loading..."}</p>
-    </div>
+    <main>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          {/* Nested routes go here */}
+          <Route index element={<Admin />} /> {/* matches /admin */}
+          <Route path="parking" element={<Parking />} />{" "}
+          {/* matches /admin/parking */}
+        </Route>
+      </Routes>
+    </main>
   );
 }
 
