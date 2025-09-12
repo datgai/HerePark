@@ -1,0 +1,19 @@
+.admin {
+  display: grid;
+  grid-template: 3rem auto / auto;
+  min-height: 100dvh;
+  width: 100dvw;
+  background: #ebebeb;
+  background: linear-gradient(
+    0deg,
+    var(--background-colour--2) 0%,
+    var(--background-colour) 100%
+  );
+  padding: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+  .admin {
+    grid-template: auto / 11rem auto;
+  }
+}

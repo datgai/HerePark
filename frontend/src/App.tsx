@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import AdminLayout from "./pages/admin/Adminlayout";
 import Admin from "./pages/admin/Admin";
 import Parking from "./pages/admin/parking/Parking";
+import "./App.css";
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminLayout />}>
           {/* Nested routes go here */}
-          <Route index element={<Admin />} /> {/* matches /admin */}
+          <Route index element={<Admin />} />
           <Route path="parking" element={<Parking />} />{" "}
           {/* matches /admin/parking */}
         </Route>
