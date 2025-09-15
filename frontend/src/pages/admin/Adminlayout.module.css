@@ -10,6 +10,7 @@
     var(--background-colour) 100%
   );
   padding: 1rem;
+  gap: 1rem;
 }
 
 @media screen and (min-width: 768px) {

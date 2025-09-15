@@ -1,14 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Button from "../../components/Button";
 import styles from "./Navbar.module.css";
+import logo from "../../assets/logo.svg";
 
 function Navbar() {
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <nav className={styles.navbar}>
       <ul>
         <li>
           <Link to="/admin">
-            <Button isActive={true} isDisabled={false}>
+            <Button isActive={isActive("/admin")} isDisabled={false}>
               <svg
                 width="24"
                 height="24"
@@ -51,7 +55,7 @@ function Navbar() {
         </li>
         <li>
           <Link to="/admin/parking">
-            <Button isActive={false} isDisabled={false}>
+            <Button isActive={isActive("/admin/parking")} isDisabled={false}>
               <svg
                 width="24"
                 height="24"
@@ -108,6 +112,9 @@ function Navbar() {
           </Button>
         </li>
       </ul>
+      <footer>
+        <img src={logo} alt="HerePark logo" />
+      </footer>
     </nav>
   );
 }

@@ -1,0 +1,7 @@
+.chart__container {
+  width: 100%;
+}
+
+.chart__grid {
+  stroke: var(--background-colour--2);
+}

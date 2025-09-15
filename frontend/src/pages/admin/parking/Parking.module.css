@@ -1,0 +1,66 @@
+section.parkingContent {
+  padding: 0.5rem;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  grid-row: 1;
+  width: fit-content;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: relative;
+  border-bottom: 3px solid var(--primary-colour);
+  border-image: linear-gradient(
+      to right,
+      var(--primary-colour),
+      var(--secondary-colour)
+    )
+    1;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card {
+  min-width: 10rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 2rem;
+  background-color: var(--text-colour--2);
+  border-radius: 24px;
+  gap: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.row#live {
+  display: flex;
+}
+
+.surveillance {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.surveillance__feed {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.prediction {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
