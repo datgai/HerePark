@@ -9,6 +9,10 @@ function Home() {
       .then((data) => setMessage(data.message));
   }, []);
 
+  useEffect(() => {
+    window.location.replace("/admin");
+  }, []);
+
   return (
     <div className="">
       <h1 className="">Welcome to the Home Page</h1>

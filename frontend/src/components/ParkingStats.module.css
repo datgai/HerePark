@@ -1,0 +1,73 @@
+.stat {
+  min-width: 10rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 2rem;
+  background-color: var(--text-colour--2);
+  border-radius: 24px;
+  gap: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  justify-content: center;
+}
+
+.stat__icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat__content span {
+  text-align: center;
+  font-size: 2.5rem;
+  margin: -1rem;
+}
+
+.stat__icon.total {
+  background: linear-gradient(135deg, #a1c4fd3c 0%, #c2e9fb3c 100%);
+}
+
+.stat__icon.total svg {
+  color: var(--blue-colour);
+}
+
+.stat__icon.occupied {
+  background: linear-gradient(135deg, #ff9a9e3c 0%, #fad0c43c 100%);
+}
+
+.stat__icon.occupied svg {
+  color: var(--red-colour);
+}
+
+.stat__icon.available {
+  background: linear-gradient(135deg, #7eff5a3c 0%, #b5f2ca3c 100%);
+}
+
+.stat__icon.available svg {
+  color: var(--green-colour);
+}
+
+.stat__icon.rate {
+  background: linear-gradient(135deg, #ffeaa73c 0%, #ffcf963c 100%);
+}
+
+.stat__icon.rate svg {
+  color: var(--primary-colour);
+}
+
+@media screen and (min-width: 768px) {
+  .stat {
+    flex-direction: row;
+  }
+}
