@@ -1,21 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import routes, websockets
 
-app = FastAPI()
+app = FastAPI(title="HerePark Backend")
 
-# Allow React frontend to access API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, set to your domain
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(routes.router, prefix="/api")
+app.include_router(websockets.router)
+
 @app.get("/")
 async def root():
-    return {"message": "Hello from FastAPI!"}
-
-@app.get("/api/ping")
-async def ping():
-    return {"message": "pong"}
+    return {"message": "HerePark API Running"}

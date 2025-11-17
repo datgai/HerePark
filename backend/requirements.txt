@@ -1,3 +1,9 @@
 fastapi
 uvicorn[standard]
-pydantic
+opencv-python
+python-multipart
+websockets
+pydantic-settings
+ultralytics
+torch
+numpy
