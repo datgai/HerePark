@@ -2,7 +2,6 @@ from ultralytics import YOLO
 import numpy as np
 import cv2
 import json
-from pathlib import Path
 
 class YOLODetector:
     def __init__(self, model_path: str, bounding_boxes_json: str, iou_threshold: float = 0.25, conf_threshold: float = 0.25):

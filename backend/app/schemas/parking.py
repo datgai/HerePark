@@ -18,3 +18,13 @@ class ParkingStats(BaseModel):
     occupied: int
     empty: int
     occupancy_rate: float
+
+class Prediction(BaseModel):
+    time: str
+    minutes_ahead: int
+    predicted_occupancy: float
+    predicted_empty_slots: int
+
+class PredictionResponse(BaseModel):
+    predictions: List[Prediction]
+    current_occupancy: float

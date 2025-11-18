@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
 interface SlotData {
-  id: number;
+  slot_id: string;
+  section: string;
   status: string;
   confidence: number;
   bbox: number[];
+  predictions: {
+    [minutes: number]: string;
+  };
 }
 
 interface StatsData {
@@ -14,10 +18,24 @@ interface StatsData {
   occupancy_rate: number;
 }
 
+interface PredictionData {
+  time: string;
+  minutes_ahead: number;
+  predicted_occupancy: number;
+  predicted_empty_slots: number;
+}
+
+interface PredictionResponse {
+  predictions: PredictionData[];
+  current_occupancy: number;
+  message?: string;
+}
+
 interface ParkingStreamData {
   frame: string;
   slots: SlotData[];
   stats: StatsData;
+  predictions: PredictionResponse | null;
 }
 
 export const useParkingStream = (
@@ -27,6 +45,7 @@ export const useParkingStream = (
     frame: "",
     slots: [],
     stats: { total: 0, occupied: 0, empty: 0, occupancy_rate: 0 },
+    predictions: null,
   });
   const [connected, setConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
