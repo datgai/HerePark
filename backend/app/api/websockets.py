@@ -14,14 +14,21 @@ yolo_detector = YOLODetector(settings.YOLO_MODEL_PATH, settings.BOUNDING_BOXES_J
 predictor = OccupancyPredictor(settings.PREDICTION_MODEL_PATH, settings.SCALER_PATH)
 
 frame_count = 0
-PREDICTION_INTERVAL = 30
+PREDICTION_INTERVAL = 900
+cached_slot_predictions = {}
+cached_overall_predictions = None
+first_prediction_done = False
 
 @router.websocket("/ws/stream")
 async def websocket_stream(websocket: WebSocket):
     await websocket.accept()
     video_service.start()
     
-    global frame_count
+    global frame_count, first_prediction_done, cached_slot_predictions, cached_overall_predictions
+    frame_count = 0
+    first_prediction_done = False
+    cached_slot_predictions = {}
+    cached_overall_predictions = None
     
     while True:
         frame = video_service.get_frame()
@@ -38,25 +45,18 @@ async def websocket_stream(websocket: WebSocket):
         empty = total - occupied
         occupancy_rate = (occupied / total * 100) if total > 0 else 0
         
-        predictions = None
-        slot_predictions = {}
-        
-        if frame_count % PREDICTION_INTERVAL == 0 and total > 0:
-            predictions = predictor.predict(occupancy_rate, total)
+        if (not first_prediction_done or frame_count % PREDICTION_INTERVAL == 0) and total > 0:
+            overall_predictions = predictor.predict(occupancy_rate, total, slot_data)
+            trend = overall_predictions.get('trend', 'stable')
             
-            if predictions and predictions.get('predictions'):
-                for pred in predictions['predictions']:
-                    occupancy_change = pred['predicted_occupancy'] - occupancy_rate
-                    
-                    for slot in slot_data:
-                        if slot['slot_id'] not in slot_predictions:
-                            slot_predictions[slot['slot_id']] = {}
-                        
-                        predicted_status = predictor.predict_slot_status(
-                            slot['status'], 
-                            occupancy_change
-                        )
-                        slot_predictions[slot['slot_id']][pred['minutes_ahead']] = predicted_status
+            cached_slot_predictions.clear()
+            for slot in slot_data:
+                trend_value = -2 if trend == 'decreasing' else 2 if trend == 'increasing' else 0
+                availability = predictor.predict_slot_availability(slot['status'], trend_value)
+                cached_slot_predictions[slot['slot_id']] = availability
+            
+            cached_overall_predictions = overall_predictions
+            first_prediction_done = True
         
         frame_count += 1
         
@@ -69,7 +69,7 @@ async def websocket_stream(websocket: WebSocket):
             'status': s['status'],
             'confidence': 0.95,
             'bbox': [0, 0, 0, 0],
-            'predictions': slot_predictions.get(s['slot_id'], {})
+            'prediction': cached_slot_predictions.get(s['slot_id'], 'unknown')
         } for s in slot_data]
         
         await websocket.send_json({
@@ -81,7 +81,7 @@ async def websocket_stream(websocket: WebSocket):
                 'empty': empty,
                 'occupancy_rate': occupancy_rate
             },
-            'predictions': predictions
+            'predictions': cached_overall_predictions
         })
         
         await asyncio.sleep(1 / settings.STREAM_FPS)

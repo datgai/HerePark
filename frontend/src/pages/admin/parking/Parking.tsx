@@ -1,8 +1,7 @@
 import style from "./Parking.module.css";
-import Layout from "../../../components/Layout";
-import parkingImg from "../../../assets/parking.png";
 import { ParkingSlotGrid } from "../../../components/ParkingSlotGrid";
 import { VideoStream } from "../../../components/VideoStream";
+import { AvailabilityList } from "../../../components/AvailabilityList";
 import { useParkingStream } from "../../../hooks/useParkingStream";
 
 function Parking() {
@@ -16,11 +15,10 @@ function Parking() {
           <h3>Surveillance</h3>
           <VideoStream />
         </div>
+
         <div className={`${style.card} ${style.prediction}`}>
           <h3>Availability Prediction</h3>
-          <p>
-            Slot A1-1 <br /> 1 Hour
-          </p>
+          <AvailabilityList slots={data.slots} />
         </div>
       </div>
       <div className={style.row}>

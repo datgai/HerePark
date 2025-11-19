@@ -49,6 +49,7 @@ export const useParkingStream = (
   });
   const [connected, setConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
+  const lastPredictionsRef = useRef<PredictionResponse | null>(null);
 
   useEffect(() => {
     const ws = new WebSocket(url);
@@ -57,7 +58,15 @@ export const useParkingStream = (
     ws.onclose = () => setConnected(false);
     ws.onmessage = (event) => {
       const parsed = JSON.parse(event.data);
-      setData(parsed);
+
+      if (parsed.predictions) {
+        lastPredictionsRef.current = parsed.predictions;
+      }
+
+      setData({
+        ...parsed,
+        predictions: lastPredictionsRef.current,
+      });
     };
 
     wsRef.current = ws;

@@ -5,7 +5,8 @@ interface SlotData {
   section: string;
   status: string;
   confidence: number;
-  predictions: {
+  prediction?: string;
+  predictions?: {
     [minutes: number]: string;
   };
 }
@@ -14,12 +15,23 @@ interface Props {
   slots: SlotData[];
 }
 
+const PREDICTION_LABELS = {
+  available_now: { text: "Now", color: "green", icon: "✓" },
+  available_soon: { text: "< 5 mins", color: "blue", icon: "" },
+  available_later: { text: "5 - 15 mins", color: "orange", icon: "" },
+  long_wait: { text: ">15 mins", color: "red", icon: "" },
+  unknown: { text: "Loading...", color: "gray", icon: "⏳" },
+};
+
 export const ParkingSlotGrid = ({ slots }: Props) => {
   const sectionA = slots.filter((s) => s.section === "A");
   const sectionB = slots.filter((s) => s.section === "B");
 
   const renderSlot = (slot: SlotData) => {
-    const hasPredictions = Object.keys(slot.predictions).length > 0;
+    console.log(`Slot ${slot.slot_id} full data:`, JSON.stringify(slot));
+    const predInfo =
+      PREDICTION_LABELS[slot.prediction as keyof typeof PREDICTION_LABELS] ||
+      PREDICTION_LABELS.unknown;
 
     return (
       <div key={slot.slot_id} className={styles.slotCard}>
@@ -37,26 +49,15 @@ export const ParkingSlotGrid = ({ slots }: Props) => {
           </span>
         </div>
 
-        {hasPredictions && (
-          <div className={styles.predictions}>
-            <span className={styles.label}>Predicted:</span>
-            <div className={styles.predictionList}>
-              {[15, 30, 45, 60].map(
-                (min) =>
-                  slot.predictions[min] && (
-                    <div key={min} className={styles.predictionItem}>
-                      <span className={styles.time}>+{min}min</span>
-                      <span
-                        className={`${styles.predStatus} ${styles[slot.predictions[min]]}`}
-                      >
-                        {slot.predictions[min] === "occupied" ? "🚗" : "✓"}
-                      </span>
-                    </div>
-                  )
-              )}
-            </div>
+        <div className={styles.prediction}>
+          <span className={styles.label}>Availability:</span>
+          <div
+            className={`${styles.predictionBadge} ${styles[predInfo.color]}`}
+          >
+            <span className={styles.predIcon}>{predInfo.icon}</span>
+            <span className={styles.predText}>{predInfo.text}</span>
           </div>
-        )}
+        </div>
 
         <div className={styles.confidence}>
           {(slot.confidence * 100).toFixed(0)}% conf
