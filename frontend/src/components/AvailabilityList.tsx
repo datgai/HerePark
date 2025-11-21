@@ -24,23 +24,23 @@ const PREDICTION_INFO = {
   available_now: {
     text: "Free Now",
     color: "green",
-    icon: "✓",
-    time: "Available",
+    icon: "",
+    time: "Available Now",
   },
   available_soon: {
     text: "Free <5min",
     color: "blue",
-    icon: "🕐",
-    time: "<5 min",
+    icon: "",
+    time: "< 5 min",
   },
   available_later: {
     text: "Wait 5-15min",
     color: "orange",
-    icon: "🕒",
-    time: "5-15 min",
+    icon: "",
+    time: "5 - 15 min",
   },
-  long_wait: { text: "Wait >15min", color: "red", icon: "🕐", time: ">15 min" },
-  unknown: { text: "Loading...", color: "gray", icon: "⏳", time: "..." },
+  long_wait: { text: "Wait >15min", color: "red", icon: "", time: ">15 min" },
+  unknown: { text: "Loading...", color: "gray", icon: "", time: "..." },
 };
 
 export const AvailabilityList = ({ slots }: Props) => {
@@ -59,8 +59,6 @@ export const AvailabilityList = ({ slots }: Props) => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Next Available Slots</h3>
-
       <div className={styles.list}>
         {sortedSlots.map((slot) => {
           const predInfo =
@@ -68,10 +66,16 @@ export const AvailabilityList = ({ slots }: Props) => {
             PREDICTION_INFO.unknown;
 
           return (
-            <div key={slot.slot_id} className={styles.slotItem}>
+            <div
+              key={slot.slot_id}
+              className={`${styles.slotItem} ${styles[`bg_${predInfo.color}`]}`}
+            >
               <div className={styles.slotInfo}>
-                <span className={styles.slotId}>{slot.slot_id}</span>
-                <span className={styles.section}>Section {slot.section}</span>
+                <span className={styles.section}>
+                  <b>Section {slot.section}:</b>
+                </span>
+                <br />
+                <span className={styles.slotId}> Slot {slot.slot_id}</span>
               </div>
 
               <div className={styles.timeInfo}>
@@ -83,7 +87,9 @@ export const AvailabilityList = ({ slots }: Props) => {
               </div>
 
               <div className={styles.statusIndicator}>
-                <span className={`${styles.dot} ${styles[slot.status]}`}></span>
+                <span
+                  className={`${styles[slot.status]} ${styles[predInfo.color]}`}
+                ></span>
               </div>
             </div>
           );

@@ -19,6 +19,7 @@ function Parking() {
         <div className={`${style.card} ${style.prediction}`}>
           <h3>Availability Prediction</h3>
           <AvailabilityList slots={data.slots} />
+          <small>Predictions may not be accurate</small>
         </div>
       </div>
       <div className={style.row}>

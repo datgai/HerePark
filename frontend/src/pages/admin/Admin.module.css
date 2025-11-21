@@ -115,6 +115,10 @@ section.adminContent {
   gap: 0.5rem;
 }
 
+.parking__info {
+  min-width: 20rem;
+}
+
 .parking__content {
   display: flex;
   flex-direction: column;
@@ -132,6 +136,10 @@ section.adminContent {
 .vehicles {
   align-items: start;
   justify-content: start;
+}
+
+.vehicles > p > strong {
+  font-size: 1.5rem;
 }
 
 .activities {

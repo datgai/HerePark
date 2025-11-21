@@ -88,26 +88,20 @@ export const ParkingStats = ({ stats }: Props) => {
       <div className={styles.stat}>
         <div className={`${styles.stat__icon} ${styles.available}`}>
           <svg
-            width="48"
-            height="49"
-            viewBox="0 0 48 49"
-            fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            <path
-              d="M6 10.5C6 9.43913 6.42143 8.42172 7.17157 7.67157C7.92172 6.92143 8.93913 6.5 10 6.5H38C39.0609 6.5 40.0783 6.92143 40.8284 7.67157C41.5786 8.42172 42 9.43913 42 10.5V38.5C42 39.5609 41.5786 40.5783 40.8284 41.3284C40.0783 42.0786 39.0609 42.5 38 42.5H10C8.93913 42.5 7.92172 42.0786 7.17157 41.3284C6.42143 40.5783 6 39.5609 6 38.5V10.5Z"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M20 32.5V16.5H25.334C26.806 16.5 28 18.29 28 20.5C28 22.71 26.806 24.5 25.334 24.5H20"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M15 5l0 2" />
+            <path d="M15 11l0 2" />
+            <path d="M15 17l0 2" />
+            <path d="M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2" />
           </svg>
         </div>
         <div className={styles.stat__content}>
@@ -119,26 +113,20 @@ export const ParkingStats = ({ stats }: Props) => {
       <div className={styles.stat}>
         <div className={`${styles.stat__icon} ${styles.rate}`}>
           <svg
-            width="49"
-            height="49"
-            viewBox="0 0 49 49"
-            fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            <path
-              d="M33.7333 16.5C33.3352 15.3705 32.6082 14.3859 31.6458 13.6731C30.6834 12.9602 29.5298 12.5517 28.3333 12.5H20.3333C18.742 12.5 17.2158 13.1321 16.0906 14.2574C14.9654 15.3826 14.3333 16.9087 14.3333 18.5C14.3333 20.0913 14.9654 21.6174 16.0906 22.7426C17.2158 23.8679 18.742 24.5 20.3333 24.5H28.3333C29.9246 24.5 31.4507 25.1321 32.5759 26.2574C33.7011 27.3826 34.3333 28.9087 34.3333 30.5C34.3333 32.0913 33.7011 33.6174 32.5759 34.7426C31.4507 35.8679 29.9246 36.5 28.3333 36.5H20.3333C19.1367 36.4483 17.9831 36.0398 17.0207 35.3269C16.0584 34.6141 15.3313 33.6295 14.9333 32.5"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M24.3333 6.5V12.5M24.3333 36.5V42.5"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+            <path d="M9 15.075l6 -6" />
+            <path d="M9 9.105v.015" />
+            <path d="M15 15.12v.015" />
           </svg>
         </div>
         <div className={styles.stat__content}>

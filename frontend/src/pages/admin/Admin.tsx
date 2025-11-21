@@ -29,10 +29,10 @@ function Admin() {
           <div className={style.parking__content}>
             <VideoStream />
             <div className={style.parking__info}>
-              Area Name <br />
+              <b>Area Name</b> <br />
               Rocks Basement Parking
               <br />
-              Address
+              <b>Address</b>
               <br />
               No.1 Address A,B
             </div>
@@ -42,13 +42,16 @@ function Admin() {
         <div className={`${style.card} ${style.vehicles}`}>
           <h3>Vehicles</h3>
           <p>
-            09:46 AM 3/3/2026<strong>AK 470</strong>
+            <strong> AK 470</strong> <br />
+            09:46 AM 3/3/2026
           </p>
           <p>
-            09:45 AM 3/3/2026<strong>WAT 1500</strong>
+            <strong> WAT 1500</strong> <br />
+            09:45 AM 3/3/2026
           </p>
           <p>
-            09:45 AM 3/3/2026<strong>TAT 3000</strong>
+            <strong> TAT 3000</strong> <br />
+            09:45 AM 3/3/2026
           </p>
         </div>
       </div>

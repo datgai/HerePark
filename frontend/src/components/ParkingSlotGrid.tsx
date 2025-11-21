@@ -16,11 +16,11 @@ interface Props {
 }
 
 const PREDICTION_LABELS = {
-  available_now: { text: "Now", color: "green", icon: "✓" },
+  available_now: { text: "Now", color: "green", icon: "" },
   available_soon: { text: "< 5 mins", color: "blue", icon: "" },
   available_later: { text: "5 - 15 mins", color: "orange", icon: "" },
   long_wait: { text: ">15 mins", color: "red", icon: "" },
-  unknown: { text: "Loading...", color: "gray", icon: "⏳" },
+  unknown: { text: "Loading...", color: "gray", icon: "" },
 };
 
 export const ParkingSlotGrid = ({ slots }: Props) => {
@@ -34,16 +34,16 @@ export const ParkingSlotGrid = ({ slots }: Props) => {
       PREDICTION_LABELS.unknown;
 
     return (
-      <div key={slot.slot_id} className={styles.slotCard}>
+      <div
+        key={slot.slot_id}
+        className={`${styles.slotCard} ${styles[predInfo.color]}`}
+      >
         <div className={styles.slotHeader}>
           <span className={styles.slotId}>{slot.slot_id}</span>
-          <span className={`${styles.statusBadge} ${styles[slot.status]}`}>
-            {slot.status === "occupied" ? "🚗" : "✓"}
-          </span>
         </div>
 
         <div className={styles.currentStatus}>
-          <span className={styles.label}>Current:</span>
+          <span className={styles.label}>Current : </span>
           <span className={`${styles.statusText} ${styles[slot.status]}`}>
             {slot.status.toUpperCase()}
           </span>
@@ -54,13 +54,8 @@ export const ParkingSlotGrid = ({ slots }: Props) => {
           <div
             className={`${styles.predictionBadge} ${styles[predInfo.color]}`}
           >
-            <span className={styles.predIcon}>{predInfo.icon}</span>
             <span className={styles.predText}>{predInfo.text}</span>
           </div>
-        </div>
-
-        <div className={styles.confidence}>
-          {(slot.confidence * 100).toFixed(0)}% conf
         </div>
       </div>
     );
