@@ -1,0 +1,232 @@
+.homepage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background-colour);
+}
+
+.homepage-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-colour) 0%,
+    var(--secondary-colour) 100%
+  );
+  color: var(--text-colour--2);
+  padding: 1.5rem;
+  border-radius: 0 0 1.5rem 1.5rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-top h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.status-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.connected {
+  background: #4ade80;
+  box-shadow: 0 0 0.5rem #4ade80;
+}
+
+.status-dot.disconnected {
+  background: #f87171;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.header-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.95;
+}
+
+.error-banner {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 1rem 1.5rem;
+  border-left: 0.25rem solid #dc2626;
+  margin: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.error-banner p {
+  margin: 0;
+}
+
+.homepage-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.card-section {
+  background: var(--text-colour--2);
+  border-radius: 1rem;
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.card-header-btn {
+  width: 100%;
+  padding: 1rem;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid var(--background-colour--2);
+}
+
+.card-header-btn:active {
+  background: var(--background-colour);
+}
+
+.card-header-btn h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-colour);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-colour);
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card-collapsed-btn {
+  padding: 0.875rem 1rem;
+  background: var(--text-colour--2);
+  border: 1px solid var(--background-colour--2);
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-colour);
+  transition: all 0.2s;
+}
+
+.card-collapsed-btn:active {
+  background: var(--background-colour);
+}
+
+.section-filter {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+  justify-content: center;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--background-colour--2);
+  background: var(--text-colour--2);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-colour);
+}
+
+.filter-btn.active {
+  background: linear-gradient(
+    135deg,
+    var(--primary-colour) 0%,
+    var(--secondary-colour) 100%
+  );
+  border-color: var(--primary-colour);
+  color: var(--text-colour--2);
+}
+
+.predictions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.prediction-box {
+  padding: 0.75rem;
+  background: var(--background-colour);
+  border-radius: 0.5rem;
+  text-align: center;
+  border-left: 3px solid var(--primary-colour);
+}
+
+.pred-time {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.pred-occupancy {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-colour);
+  margin: 0.25rem 0;
+}
+
+.pred-slots {
+  font-size: 0.8125rem;
+  color: var(--text-colour);
+}
+
+@media (min-width: 48rem) {
+  .homepage-main {
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+
+  .predictions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

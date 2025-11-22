@@ -5,7 +5,10 @@ import logo from "../../assets/logo.svg";
 
 function Navbar() {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    const cleanPath = location.pathname.replace(/\/$/, ""); // remove trailing slash
+    return cleanPath === path;
+  };
 
   return (
     <nav className={styles.navbar}>
