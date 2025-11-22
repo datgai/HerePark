@@ -13,22 +13,27 @@ interface SlotData {
 
 interface Props {
   slots: SlotData[];
+  compact?: boolean;
 }
 
 const PREDICTION_LABELS = {
-  available_now: { text: "Now", color: "green", icon: "" },
-  available_soon: { text: "< 5 mins", color: "blue", icon: "" },
-  available_later: { text: "5 - 15 mins", color: "orange", icon: "" },
-  long_wait: { text: ">15 mins", color: "red", icon: "" },
-  unknown: { text: "Loading...", color: "gray", icon: "" },
+  available_now: { text: "Now", color: "green" },
+  available_soon: { text: "< 5 mins", color: "blue" },
+  available_later: { text: "5 - 15 mins", color: "orange" },
+  long_wait: { text: ">15 mins", color: "red" },
+  unknown: { text: "Loading...", color: "gray" },
 };
 
-export const ParkingSlotGrid = ({ slots }: Props) => {
+export const ParkingSlotGrid = ({ slots, compact = false }: Props) => {
   const sectionA = slots.filter((s) => s.section === "A");
   const sectionB = slots.filter((s) => s.section === "B");
 
+  // Hide entire component in compact mode if no slots
+  if (compact && slots.length === 0) {
+    return null;
+  }
+
   const renderSlot = (slot: SlotData) => {
-    console.log(`Slot ${slot.slot_id} full data:`, JSON.stringify(slot));
     const predInfo =
       PREDICTION_LABELS[slot.prediction as keyof typeof PREDICTION_LABELS] ||
       PREDICTION_LABELS.unknown;
@@ -43,14 +48,15 @@ export const ParkingSlotGrid = ({ slots }: Props) => {
         </div>
 
         <div className={styles.currentStatus}>
-          <span className={styles.label}>Current : </span>
+          <span className={styles.label}>Current: </span>
+          <br />
           <span className={`${styles.statusText} ${styles[slot.status]}`}>
             {slot.status.toUpperCase()}
           </span>
         </div>
 
         <div className={styles.prediction}>
-          <span className={styles.label}>Availability:</span>
+          <span className={styles.label}>Availability: </span>
           <div
             className={`${styles.predictionBadge} ${styles[predInfo.color]}`}
           >
@@ -61,29 +67,23 @@ export const ParkingSlotGrid = ({ slots }: Props) => {
     );
   };
 
+  const renderSection = (title: string, section: SlotData[]) => (
+    <div className={styles.section}>
+      <h3 className={styles.sectionTitle}>{title}</h3>
+      <div className={styles.grid}>
+        {section.length > 0 ? (
+          section.map(renderSlot)
+        ) : (
+          <p className={styles.empty}>No slots detected</p>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className={styles.container}>
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Section A</h3>
-        <div className={styles.grid}>
-          {sectionA.length > 0 ? (
-            sectionA.map(renderSlot)
-          ) : (
-            <p className={styles.empty}>No slots detected</p>
-          )}
-        </div>
-      </div>
-
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Section B</h3>
-        <div className={styles.grid}>
-          {sectionB.length > 0 ? (
-            sectionB.map(renderSlot)
-          ) : (
-            <p className={styles.empty}>No slots detected</p>
-          )}
-        </div>
-      </div>
+      {renderSection("Section A", sectionA)}
+      {renderSection("Section B", sectionB)}
     </div>
   );
 };

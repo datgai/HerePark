@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MapPin, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { ParkingStats } from "../components/ParkingStats";
 import { ParkingSlotGrid } from "../components/ParkingSlotGrid";
@@ -11,6 +11,12 @@ interface CardVisibility {
   predictions: boolean;
   availability: boolean;
   layout: boolean;
+}
+
+interface PredictionData {
+  minutes_ahead: number;
+  predicted_occupancy: number;
+  predicted_empty_slots: number;
 }
 
 export default function HomePage() {
@@ -34,6 +40,10 @@ export default function HomePage() {
     selectedSection === "all"
       ? data.slots
       : data.slots.filter((s) => s.section === selectedSection);
+
+  const predictions = Array.isArray(data.predictions?.predictions)
+    ? data.predictions.predictions
+    : [];
 
   return (
     <div className="homepage">
@@ -74,7 +84,7 @@ export default function HomePage() {
               <ChevronUp />
             </button>
             <div className="card-content">
-              <ParkingStats stats={data.stats} />
+              <ParkingStats stats={data.stats} hidden={["occupied"]} />
             </div>
           </section>
         )}
@@ -91,55 +101,52 @@ export default function HomePage() {
         )}
 
         {/* Predictions Section */}
-        {data.predictions?.predictions &&
-          data.predictions.predictions.length > 0 && (
-            <>
-              {cardVisibility.predictions && (
-                <section className="card-section">
-                  <button
-                    className="card-header-btn"
-                    onClick={() => toggleCard("predictions")}
-                    aria-label="Toggle predictions"
-                  >
-                    <div className="card-title">
-                      <Info />
-                      Next 15 Minutes
-                    </div>
-                    <ChevronUp />
-                  </button>
-                  <div className="card-content">
-                    <div className="predictions-grid">
-                      {data.predictions.predictions
-                        .slice(0, 3)
-                        .map((pred, idx) => (
-                          <div key={idx} className="prediction-box">
-                            <div className="pred-time">
-                              {pred.minutes_ahead}m
-                            </div>
-                            <div className="pred-occupancy">
-                              {Math.round(pred.predicted_occupancy)}%
-                            </div>
-                            <div className="pred-slots">
-                              {pred.predicted_empty_slots} slots
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {!cardVisibility.predictions && (
+        {predictions.length > 0 && (
+          <>
+            {cardVisibility.predictions && (
+              <section className="card-section">
                 <button
-                  className="card-collapsed-btn"
+                  className="card-header-btn"
                   onClick={() => toggleCard("predictions")}
+                  aria-label="Toggle predictions"
                 >
-                  <span>Next 15 Minutes</span>
-                  <ChevronDown />
+                  <div className="card-title">
+                    <Info />
+                    Next 15 Minutes
+                  </div>
+                  <ChevronUp />
                 </button>
-              )}
-            </>
-          )}
+                <div className="card-content">
+                  <div className="predictions-grid">
+                    {predictions
+                      .slice(0, 3)
+                      .map((pred: PredictionData, idx: number) => (
+                        <div key={idx} className="prediction-box">
+                          <div className="pred-time">{pred.minutes_ahead}m</div>
+                          <div className="pred-occupancy">
+                            {Math.round(pred.predicted_occupancy)}%
+                          </div>
+                          <div className="pred-slots">
+                            {pred.predicted_empty_slots} slots
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {!cardVisibility.predictions && (
+              <button
+                className="card-collapsed-btn"
+                onClick={() => toggleCard("predictions")}
+              >
+                <span>Next 15 Minutes</span>
+                <ChevronDown />
+              </button>
+            )}
+          </>
+        )}
 
         {/* Section Filter */}
         <div className="section-filter">
@@ -167,7 +174,7 @@ export default function HomePage() {
               <ChevronUp />
             </button>
             <div className="card-content">
-              <AvailabilityList slots={filteredSlots} compact={true} />
+              <AvailabilityList slots={filteredSlots} />
             </div>
           </section>
         )}
@@ -194,7 +201,7 @@ export default function HomePage() {
               <ChevronUp />
             </button>
             <div className="card-content">
-              <ParkingSlotGrid slots={filteredSlots} compact={true} />
+              <ParkingSlotGrid slots={filteredSlots} compact />
             </div>
           </section>
         )}
