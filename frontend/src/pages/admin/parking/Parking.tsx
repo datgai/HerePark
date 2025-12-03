@@ -9,11 +9,9 @@ import { useParkingStream } from "../../../hooks/useParkingStream";
 const PARKING_SECTIONS = {
   AB: {
     name: "Section A & B",
-    description: "Main Parking",
   },
   C: {
     name: "Section C",
-    description: "Outside Parking",
   },
 };
 
@@ -23,21 +21,6 @@ function Parking() {
 
   const section = PARKING_SECTIONS[currentSection];
   const sectionKeys = Object.keys(PARKING_SECTIONS);
-  const currentIndex = sectionKeys.indexOf(currentSection);
-  const canGoPrev = currentIndex > 0;
-  const canGoNext = currentIndex < sectionKeys.length - 1;
-
-  const handlePrevSection = () => {
-    if (canGoPrev) {
-      setCurrentSection(sectionKeys[currentIndex - 1]);
-    }
-  };
-
-  const handleNextSection = () => {
-    if (canGoNext) {
-      setCurrentSection(sectionKeys[currentIndex + 1]);
-    }
-  };
 
   const handleSectionClick = (sectionKey) => {
     setCurrentSection(sectionKey);
@@ -67,9 +50,6 @@ function Parking() {
               </div>
             ))}
           </div>
-        </div>
-        <div className={style.sectionInfo}>
-          <p className={style.sectionDesc}>{section.description}</p>
         </div>
       </nav>
 
@@ -104,29 +84,6 @@ function Parking() {
           <h3>Layout - {section.name}</h3>
           <ParkingSlotGrid slots={data.slots} />
         </div>
-      </div>
-
-      {/* Section Navigation */}
-      <div className={style.sectionNav}>
-        <button
-          onClick={handlePrevSection}
-          disabled={!canGoPrev}
-          className={style.navBtn}
-          aria-label="Previous section"
-        >
-          ← Previous
-        </button>
-        <span className={style.navIndicator}>
-          Section {currentIndex + 1} of {sectionKeys.length}
-        </span>
-        <button
-          onClick={handleNextSection}
-          disabled={!canGoNext}
-          className={style.navBtn}
-          aria-label="Next section"
-        >
-          Next →
-        </button>
       </div>
     </section>
   );

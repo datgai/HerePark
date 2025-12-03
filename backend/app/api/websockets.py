@@ -6,6 +6,7 @@ import json
 from app.services.video_stream import VideoStreamService
 from app.services.detector import YOLODetector
 from app.services.predictor import OccupancyPredictor
+from app.services.slot_mapper import SlotMapper
 from app.core.config import settings
 
 router = APIRouter()
@@ -24,6 +25,7 @@ SECTION_CONFIG = {
 detectors = {}
 predictors = {}
 video_services = {}
+slot_mappers = {}
 active_connections = {}
 
 PREDICTION_FRAME_INTERVAL = 30
@@ -43,44 +45,43 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
     await websocket.accept()
     print(f"[WS] Connection accepted for section: {section}")
     
-    # Track active connections
     if section not in active_connections:
         active_connections[section] = []
     active_connections[section].append(websocket)
-    print(f"[WS] Active connections for {section}: {len(active_connections[section])}")
     
     config = SECTION_CONFIG[section]
     
     # Initialize services
     if section not in video_services:
-        print(f"[INIT] Creating VideoStreamService for {section}")
         video_services[section] = VideoStreamService(
             config["video_source"], 
             settings.STREAM_FPS
         )
         video_services[section].start()
-        print(f"[INIT] VideoStreamService started - Source: {config['video_source']}")
-    else:
-        print(f"[INIT] Reusing existing VideoStreamService for {section}")
     
     if section not in detectors:
-        print(f"[INIT] Creating YOLODetector for {section}")
         detectors[section] = YOLODetector(
             settings.YOLO_MODEL_PATH,
             config["bbox_file"]
         )
-        print(f"[INIT] YOLODetector created - BBox: {config['bbox_file']}")
     
     if section not in predictors:
-        print(f"[INIT] Creating OccupancyPredictor for {section}")
         predictors[section] = OccupancyPredictor(
             settings.PREDICTION_MODEL_PATH,
             settings.SCALER_PATH
         )
     
+    if section not in slot_mappers:
+        slot_mappers[section] = SlotMapper(
+            settings.FRAME_WIDTH,
+            settings.FRAME_HEIGHT,
+            section=section
+        )
+    
     video_service = video_services[section]
     detector = detectors[section]
     predictor = predictors[section]
+    mapper = slot_mappers[section]
     
     frame_count = 0
     slot_predictions = {}
@@ -91,7 +92,6 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
         while True:
             frame = video_service.get_frame()
             if frame is None:
-                print(f"[STREAM] No frame received for {section}")
                 break
             
             frame = video_service.resize_frame(
@@ -100,21 +100,31 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
                 settings.FRAME_HEIGHT
             )
             
-            slot_data = detector.detect(frame)
-            annotated_frame = detector.draw_slots(frame, slot_data)
+            raw_slot_data = detector.detect(frame)
+            mapped_slot_data = mapper.assign_slot_ids(raw_slot_data)
             
-            total = len(slot_data)
-            occupied = sum(1 for s in slot_data if s['status'] == 'occupied')
+            # Merge polygon and center from raw data into mapped data
+            for mapped_slot in mapped_slot_data:
+                for raw_slot in raw_slot_data:
+                    if raw_slot['slot_id'] == mapped_slot['slot_id']:
+                        mapped_slot['polygon'] = raw_slot['polygon']
+                        mapped_slot['center'] = raw_slot['center']
+                        break
+            
+            annotated_frame = detector.draw_slots(frame, mapped_slot_data)
+            
+            total = len(mapped_slot_data)
+            occupied = sum(1 for s in mapped_slot_data if s['status'] == 'occupied')
             empty = total - occupied
             occupancy_rate = (occupied / total * 100) if total > 0 else 0
             
             # Update predictions periodically
             if frame_count - last_prediction_frame >= PREDICTION_FRAME_INTERVAL and total > 0:
-                overall_predictions = predictor.predict(occupancy_rate, total, slot_data)
+                overall_predictions = predictor.predict(occupancy_rate, total, mapped_slot_data)
                 trend = overall_predictions.get('trend', 'stable')
                 
                 slot_predictions.clear()
-                for slot in slot_data:
+                for slot in mapped_slot_data:
                     trend_value = -2 if trend == 'decreasing' else 2 if trend == 'increasing' else 0
                     availability = predictor.predict_slot_availability(
                         slot['status'], 
@@ -126,23 +136,20 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
             
             frame_count += 1
             
-            _, buffer = cv2.imencode(
-                '.jpg', 
-                annotated_frame, 
-                [cv2.IMWRITE_JPEG_QUALITY, 80]
-            )
+            _, buffer = cv2.imencode('.jpg', annotated_frame, 
+                                     [cv2.IMWRITE_JPEG_QUALITY, 80])
             frame_base64 = base64.b64encode(buffer).decode('utf-8')
             
             slots_output = [
                 {
                     'slot_id': s['slot_id'],
-                    'section': s['slot_id'][0],
+                    'section': s['section'],
                     'status': s['status'],
-                    'confidence': 0.95,
-                    'bbox': [0, 0, 0, 0],
+                    'confidence': s.get('confidence', 0.95),
+                    'bbox': s['bbox'],
                     'prediction': slot_predictions.get(s['slot_id'], 'unknown')
                 } 
-                for s in slot_data
+                for s in mapped_slot_data
             ]
             
             payload = {
@@ -160,7 +167,6 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
             
             await websocket.send_json(payload)
             
-            # Log every 150 frames (10 seconds at 15 FPS)
             if frame_count % 150 == 0:
                 print(f"[STREAM] {section} - Frame {frame_count}, Slots: {total}, Occupied: {occupied}")
             
@@ -173,13 +179,11 @@ async def websocket_stream(websocket: WebSocket, section: str = "AB"):
         try:
             await websocket.send_json({"error": str(e)})
         except (RuntimeError, WebSocketDisconnect):
-            print(f"[WS ERROR] Could not send error message to {section}")
+            pass
     finally:
-        # Remove from active connections
         if section in active_connections:
             try:
                 active_connections[section].remove(websocket)
-                print(f"[WS] Removed connection from {section}. Remaining: {len(active_connections[section])}")
             except ValueError:
                 pass
         

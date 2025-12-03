@@ -62,7 +62,9 @@ class YOLODetector:
                 'slot_id': slot_id,
                 'status': status,
                 'polygon': polygon.tolist(),
-                'center': [int(np.mean(polygon[:, 0])), int(np.mean(polygon[:, 1]))]
+                'center': [int(np.mean(polygon[:, 0])), int(np.mean(polygon[:, 1]))],
+                'bbox': [int(polygon[:, 0].min()), int(polygon[:, 1].min()), 
+                        int(polygon[:, 0].max()), int(polygon[:, 1].max())]
             })
         
         return slot_data
@@ -85,14 +87,26 @@ class YOLODetector:
         overlay = frame.copy()
         
         for slot in slot_data:
-            polygon = np.array(slot['polygon'], np.int32)
+            # Handle both formats: from detect() and from slot_mapper
+            polygon = slot.get('polygon') or [
+                [slot['bbox'][0], slot['bbox'][1]],
+                [slot['bbox'][2], slot['bbox'][1]],
+                [slot['bbox'][2], slot['bbox'][3]],
+                [slot['bbox'][0], slot['bbox'][3]]
+            ]
+            
+            polygon_arr = np.array(polygon, np.int32)
             color = (0, 0, 255) if slot['status'] == 'occupied' else (0, 255, 0)
             
-            cv2.polylines(overlay, [polygon], True, color, 2)
-            cv2.fillPoly(overlay, [polygon], color)
+            cv2.polylines(overlay, [polygon_arr], True, color, 2)
+            cv2.fillPoly(overlay, [polygon_arr], color)
             
-            cx, cy = slot['center']
-            cv2.putText(overlay, slot['slot_id'], (cx - 15, cy), 
+            center = slot.get('center') or [
+                int((slot['bbox'][0] + slot['bbox'][2]) / 2),
+                int((slot['bbox'][1] + slot['bbox'][3]) / 2)
+            ]
+            
+            cv2.putText(overlay, slot['slot_id'], (center[0] - 15, center[1]), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         
         annotated = cv2.addWeighted(overlay, 0.4, frame, 0.6, 0)
