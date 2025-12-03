@@ -6,9 +6,7 @@ interface SlotData {
   status: string;
   confidence: number;
   bbox: number[];
-  predictions: {
-    [minutes: number]: string;
-  };
+  prediction?: string;
 }
 
 interface StatsData {
@@ -38,9 +36,7 @@ interface ParkingStreamData {
   predictions: PredictionResponse | null;
 }
 
-export const useParkingStream = (
-  url: string = "ws://localhost:8000/ws/stream"
-) => {
+export const useParkingStream = (section: string = "AB", url?: string) => {
   const [data, setData] = useState<ParkingStreamData>({
     frame: "",
     slots: [],
@@ -48,31 +44,72 @@ export const useParkingStream = (
     predictions: null,
   });
   const [connected, setConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const lastPredictionsRef = useRef<PredictionResponse | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(url);
+    // Build WebSocket URL with section parameter
+    const wsUrl = url || `ws://localhost:8000/ws/stream/${section}`;
 
-    ws.onopen = () => setConnected(true);
-    ws.onclose = () => setConnected(false);
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      setConnected(true);
+      setError(null);
+    };
+
+    ws.onclose = () => {
+      setConnected(false);
+    };
+
+    ws.onerror = (event) => {
+      console.error("WebSocket error:", event);
+      setError("Failed to connect to parking stream");
+    };
+
     ws.onmessage = (event) => {
-      const parsed = JSON.parse(event.data);
+      try {
+        const parsed = JSON.parse(event.data);
 
-      if (parsed.predictions) {
-        lastPredictionsRef.current = parsed.predictions;
+        if (parsed.predictions) {
+          lastPredictionsRef.current = parsed.predictions;
+        }
+
+        setData((prev) => ({
+          frame: parsed.frame || prev.frame,
+          slots: Array.isArray(parsed.slots) ? parsed.slots : [],
+          stats: parsed.stats || prev.stats,
+          predictions: lastPredictionsRef.current,
+        }));
+      } catch (err) {
+        console.error("Error parsing stream data:", err);
       }
-
-      setData({
-        ...parsed,
-        predictions: lastPredictionsRef.current,
-      });
     };
 
     wsRef.current = ws;
 
-    return () => ws.close();
-  }, [url]);
+    // Cleanup on unmount or section change
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, [section, url]);
 
-  return { data, connected };
+  return {
+    data: {
+      frame: data.frame || "",
+      slots: data.slots || [],
+      stats: data.stats || {
+        total: 0,
+        occupied: 0,
+        empty: 0,
+        occupancy_rate: 0,
+      },
+      predictions: data.predictions,
+    },
+    connected,
+    error,
+  };
 };
