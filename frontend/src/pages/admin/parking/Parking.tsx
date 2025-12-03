@@ -6,19 +6,14 @@ import { AvailabilityList } from "../../../components/AvailabilityList";
 import { ParkingSlotGrid } from "../../../components/ParkingSlotGrid";
 import { useParkingStream } from "../../../hooks/useParkingStream";
 
-// Parking sections configuration
 const PARKING_SECTIONS = {
   AB: {
     name: "Section A & B",
     description: "Main Parking",
   },
-  level1: {
+  C: {
     name: "Section C",
     description: "Outside Parking",
-  },
-  level2: {
-    name: "Level 2",
-    description: "Second Floor Parking",
   },
 };
 
@@ -83,15 +78,15 @@ function Parking() {
 
       {/* Main Content */}
       <div className={style.row} id={style.live}>
-        {/* Video Surveillance */}
+        {/* Video Surveillance - Pass section here */}
         <div className={`${style.card} ${style.surveillance}`}>
           <h3>
             <Video size={20} />
             Surveillance
           </h3>
-          <VideoStream />
+          <VideoStream section={currentSection} />
           <small className={style.streamMeta}>
-            Stream: {currentSection} | Bounding Boxes: 10
+            Stream: {currentSection} | Source: parking_{currentSection}.mp4
           </small>
         </div>
 
@@ -99,7 +94,7 @@ function Parking() {
         <div className={`${style.card} ${style.prediction}`}>
           <h3>Availability Prediction</h3>
           <AvailabilityList slots={data.slots} />
-          <small>Predictions may not be accurate</small>
+          <small>Updated every ~2 seconds</small>
         </div>
       </div>
 
@@ -111,7 +106,7 @@ function Parking() {
         </div>
       </div>
 
-      {/* Section Navigation Footer */}
+      {/* Section Navigation */}
       <div className={style.sectionNav}>
         <button
           onClick={handlePrevSection}

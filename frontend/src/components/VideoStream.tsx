@@ -1,8 +1,12 @@
 import { useParkingStream } from "../hooks/useParkingStream";
 import styles from "./VideoStream.module.css";
 
-export const VideoStream = () => {
-  const { data, connected } = useParkingStream();
+interface VideoStreamProps {
+  section?: string;
+}
+
+export const VideoStream = ({ section = "AB" }: VideoStreamProps) => {
+  const { data, connected } = useParkingStream(section);
 
   return (
     <div className={styles.container}>
@@ -15,7 +19,7 @@ export const VideoStream = () => {
       {data.frame ? (
         <img
           src={`data:image/jpeg;base64,${data.frame}`}
-          alt="Parking lot stream"
+          alt={`Parking lot stream - ${section}`}
           className={styles.video}
         />
       ) : (
