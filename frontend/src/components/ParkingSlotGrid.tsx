@@ -5,10 +5,8 @@ interface SlotData {
   section: string;
   status: string;
   confidence: number;
+  bbox: number[];
   prediction?: string;
-  predictions?: {
-    [minutes: number]: string;
-  };
 }
 
 interface Props {
@@ -27,11 +25,7 @@ const PREDICTION_LABELS = {
 export const ParkingSlotGrid = ({ slots, compact = false }: Props) => {
   const sectionA = slots.filter((s) => s.section === "A");
   const sectionB = slots.filter((s) => s.section === "B");
-
-  // Hide entire component in compact mode if no slots
-  if (compact && slots.length === 0) {
-    return null;
-  }
+  const sectionC = slots.filter((s) => s.section === "C");
 
   const renderSlot = (slot: SlotData) => {
     const predInfo =
@@ -67,23 +61,30 @@ export const ParkingSlotGrid = ({ slots, compact = false }: Props) => {
     );
   };
 
-  const renderSection = (title: string, section: SlotData[]) => (
-    <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>{title}</h3>
-      <div className={styles.grid}>
-        {section.length > 0 ? (
-          section.map(renderSlot)
-        ) : (
-          <p className={styles.empty}>No slots detected</p>
-        )}
+  const renderSection = (title: string, section: SlotData[]) => {
+    if (section.length === 0) return null;
+
+    return (
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+        <div className={styles.grid}>{section.map(renderSlot)}</div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  if (slots.length === 0) {
+    return (
+      <div className={styles.container}>
+        <p className={styles.empty}>No slots detected</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       {renderSection("Section A", sectionA)}
       {renderSection("Section B", sectionB)}
+      {renderSection("Section C", sectionC)}
     </div>
   );
 };

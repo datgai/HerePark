@@ -9,7 +9,7 @@ class SlotMapper:
         slots_with_ids = []
         
         if self.section == "C":
-            # For Section C: all slots are labeled C1, C2, C3...
+            # For Section C: sort by position and label C1, C2, C3...
             sorted_dets = self._sort_detections_by_position(detections)
             
             for i, det in enumerate(sorted_dets):
@@ -17,15 +17,19 @@ class SlotMapper:
                 x1, y1, x2, y2 = bbox
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
+                polygon = det.get('polygon', [])
+                center = det.get('center', [center_x, center_y])
                 
                 slot_data = {
-                    'bbox': bbox,
-                    'status': det.get('class_name', det.get('status', 'unknown')),
-                    'confidence': det.get('confidence', 0.0),
-                    'center_x': center_x,
-                    'center_y': center_y,
                     'slot_id': f"C{i + 1}",
-                    'section': 'C'
+                    'section': 'C',
+                    'status': det.get('status', det.get('class_name', 'unknown')),
+                    'confidence': det.get('confidence', 0.0),
+                    'bbox': bbox,
+                    'polygon': polygon,
+                    'center': center,
+                    'center_x': center_x,
+                    'center_y': center_y
                 }
                 slots_with_ids.append(slot_data)
         else:
@@ -38,11 +42,15 @@ class SlotMapper:
                 x1, y1, x2, y2 = bbox
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
+                polygon = det.get('polygon', [])
+                center = det.get('center', [center_x, center_y])
                 
                 slot_data = {
-                    'bbox': bbox,
-                    'status': det.get('class_name', det.get('status', 'unknown')),
+                    'status': det.get('status', det.get('class_name', 'unknown')),
                     'confidence': det.get('confidence', 0.0),
+                    'bbox': bbox,
+                    'polygon': polygon,
+                    'center': center,
                     'center_x': center_x,
                     'center_y': center_y
                 }
@@ -77,7 +85,5 @@ class SlotMapper:
             x1 = bbox[0]
             dets_with_pos.append((det, y1, x1))
         
-        # Sort by y (row), then by x (column)
         dets_with_pos.sort(key=lambda item: (item[1], item[2]))
-        
         return [det for det, _, _ in dets_with_pos]

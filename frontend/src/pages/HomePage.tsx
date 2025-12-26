@@ -20,7 +20,6 @@ interface PredictionData {
 }
 
 export default function HomePage() {
-  const { data, connected, error } = useParkingStream();
   const [selectedSection, setSelectedSection] = useState("all");
   const [cardVisibility, setCardVisibility] = useState<CardVisibility>({
     stats: true,
@@ -28,6 +27,9 @@ export default function HomePage() {
     availability: true,
     layout: true,
   });
+
+  const parkingSection = selectedSection === "C" ? "C" : "AB";
+  const { data, connected, error } = useParkingStream(parkingSection);
 
   const toggleCard = (card: keyof CardVisibility) => {
     setCardVisibility((prev) => ({
@@ -58,7 +60,7 @@ export default function HomePage() {
             />
           </div>
           <p className="header-location">
-            <MapPin /> Building A - Basement Parking
+            <MapPin size={18} /> Building A - Basement Parking
           </p>
         </div>
       </header>
@@ -81,7 +83,7 @@ export default function HomePage() {
               aria-label="Toggle stats"
             >
               <h2>Parking Overview</h2>
-              <ChevronUp />
+              <ChevronUp size={20} />
             </button>
             <div className="card-content">
               <ParkingStats stats={data.stats} hidden={["occupied"]} />
@@ -89,14 +91,13 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* Collapsed Stats Button */}
         {!cardVisibility.stats && (
           <button
             className="card-collapsed-btn"
             onClick={() => toggleCard("stats")}
           >
             <span>Parking Overview</span>
-            <ChevronDown />
+            <ChevronDown size={20} />
           </button>
         )}
 
@@ -111,10 +112,10 @@ export default function HomePage() {
                   aria-label="Toggle predictions"
                 >
                   <div className="card-title">
-                    <Info />
+                    <Info size={20} />
                     Next 15 Minutes
                   </div>
-                  <ChevronUp />
+                  <ChevronUp size={20} />
                 </button>
                 <div className="card-content">
                   <div className="predictions-grid">
@@ -142,7 +143,7 @@ export default function HomePage() {
                 onClick={() => toggleCard("predictions")}
               >
                 <span>Next 15 Minutes</span>
-                <ChevronDown />
+                <ChevronDown size={20} />
               </button>
             )}
           </>
@@ -150,7 +151,7 @@ export default function HomePage() {
 
         {/* Section Filter */}
         <div className="section-filter">
-          {["all", "A", "B"].map((sec) => (
+          {["all", "A", "B", "C"].map((sec) => (
             <button
               key={sec}
               onClick={() => setSelectedSection(sec)}
@@ -171,10 +172,16 @@ export default function HomePage() {
               aria-label="Toggle availability list"
             >
               <h2>Available Slots</h2>
-              <ChevronUp />
+              <ChevronUp size={20} />
             </button>
             <div className="card-content">
-              <AvailabilityList slots={filteredSlots} />
+              {filteredSlots.length > 0 ? (
+                <AvailabilityList slots={filteredSlots} />
+              ) : (
+                <p style={{ textAlign: "center", color: "#9ca3af" }}>
+                  No slots available
+                </p>
+              )}
             </div>
           </section>
         )}
@@ -185,7 +192,7 @@ export default function HomePage() {
             onClick={() => toggleCard("availability")}
           >
             <span>Available Slots ({filteredSlots.length})</span>
-            <ChevronDown />
+            <ChevronDown size={20} />
           </button>
         )}
 
@@ -198,10 +205,10 @@ export default function HomePage() {
               aria-label="Toggle parking layout"
             >
               <h2>Parking Layout</h2>
-              <ChevronUp />
+              <ChevronUp size={20} />
             </button>
             <div className="card-content">
-              <ParkingSlotGrid slots={filteredSlots} compact />
+              <ParkingSlotGrid slots={filteredSlots} compact={false} />
             </div>
           </section>
         )}
@@ -212,7 +219,7 @@ export default function HomePage() {
             onClick={() => toggleCard("layout")}
           >
             <span>Parking Layout</span>
-            <ChevronDown />
+            <ChevronDown size={20} />
           </button>
         )}
       </main>
